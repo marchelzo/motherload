@@ -73,8 +73,11 @@ void SDL::quit()
 {
     for (auto t : textures)
         SDL_DestroyTexture(t);
+    for (auto s : sounds)
+        Mix_FreeChunk(s);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    Mix_Quit();
     IMG_Quit();
     SDL_Quit();
 }

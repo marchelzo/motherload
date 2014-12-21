@@ -25,9 +25,9 @@ void Block::load()
 
 Block::Block(bool not_empty): _drilled{!not_empty}
 {
-    _drillable = ore != Ore::ROCK;
     ore = not_empty ? (Ore) (rand() % (int) Ore::NUM_ORE_TYPES) : Ore::NONE;
     if ((float) rand() / RAND_MAX > 0.08) ore = Ore::NONE;
+    _drillable = ore != Ore::ROCK;
 }
 
 size_t Block::texture()

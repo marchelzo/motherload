@@ -270,16 +270,19 @@ void Digger::handle_key_down(SDL_Keycode k)
     switch (k) {
     case SDLK_DOWN:
         if (!(World::blocks[Digger::bottom() / 64][(Digger::left() + 32) / 64].drilled()) &&
+             (World::blocks[Digger::bottom() / 64][(Digger::left() + 32) / 64].drillable()) &&
              !LEFT_PRESSED && !RIGHT_PRESSED && std::abs(vx) < 0.3)
              drill_down_prepare();
         break;
     case SDLK_RIGHT:
         if (!(World::blocks[(Digger::top() + 32) / 64][Digger::right() / 64].drilled()) &&
+             (World::blocks[(Digger::top() + 32) / 64][Digger::right() / 64].drillable()) &&
              !UP_PRESSED && !DOWN_PRESSED && vy == 0)
              drill_right_prepare();
         break;
     case SDLK_LEFT:
         if (!(World::blocks[(Digger::top() + 32) / 64][(Digger::left() - 1) / 64].drilled()) &&
+             (World::blocks[(Digger::top() + 32) / 64][(Digger::left() - 1) / 64].drillable()) &&
              !UP_PRESSED && !DOWN_PRESSED && vy == 0)
             drill_left_prepare();
         break;
