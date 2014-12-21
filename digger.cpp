@@ -102,6 +102,15 @@ static void clip()
         Digger::y = 64 * bottom_pos;
         vy = 0;
     }
+
+    /* keep the digger inside the map */
+    if (Digger::x < 0)
+        Digger::x = 0;
+    else if (Digger::x + 64 > SDL::WINDOW_WIDTH)
+        Digger::x = SDL::WINDOW_WIDTH - 64;
+    if (Digger::y < 0)
+        Digger::y = 0;
+
 }
 
 static void default_update()
