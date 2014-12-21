@@ -12,5 +12,6 @@ namespace Digger {
     void load();
     void draw();
     extern void (*update)();
-    void handle_key(SDL_Keycode);
+    void handle_key_down(SDL_Keycode);
+    void handle_key_up(SDL_Keycode);
 }

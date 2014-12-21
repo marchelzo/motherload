@@ -25,11 +25,13 @@ static size_t current_prop_id;
 static size_t current_drill_id;
 static int drill_x_off;
 static int drill_y_off;
-
+static size_t drill_sound_id;
+static size_t propeller_sound_id;
 static bool show_propeller;
 static bool show_drill;
 static size_t frames_since_last_rotate;
 static double drill_angle;
+static bool propeller_sound_playing;
 
 float Digger::x;
 float Digger::y;
@@ -190,6 +192,7 @@ static void drilling_down_update()
 
 static void drill_down_prepare()
 {
+    SDL::play_sound(drill_sound_id);
     Digger::update = drilling_down_update;
     show_drill = true;
     drill_angle = 0.0;
@@ -200,6 +203,7 @@ static void drill_down_prepare()
 
 static void drill_right_prepare()
 {
+    SDL::play_sound(drill_sound_id);
     Digger::update = drilling_right_update;
     show_drill = true;
     drill_angle = 270.0;
@@ -209,6 +213,7 @@ static void drill_right_prepare()
 
 static void drill_left_prepare()
 {
+    SDL::play_sound(drill_sound_id);
     Digger::update = drilling_left_update;
     show_drill = true;
     drill_angle = 90.0;
@@ -227,6 +232,10 @@ void Digger::load()
     propeller_ids[2] = SDL::load_texture("./assets/prop3.png");
     drill_ids[0]     = SDL::load_texture("./assets/drill1.png");
     drill_ids[1]     = SDL::load_texture("./assets/drill2.png");
+    
+    /* Load sound effects for drill and propeller */
+    drill_sound_id = SDL::load_sound("./assets/drill.wav");
+    propeller_sound_id = SDL::load_sound("./assets/disco.wav");
 
     /* set the initial update function to default_update */
     Digger::update = default_update;
@@ -244,7 +253,7 @@ void Digger::draw()
                             (int) Digger::y + 64 + drill_y_off - World::scroll_y, drill_angle);
 }
 
-void Digger::handle_key(SDL_Keycode k)
+void Digger::handle_key_down(SDL_Keycode k)
 {
     if (show_drill) return;
 
@@ -265,6 +274,20 @@ void Digger::handle_key(SDL_Keycode k)
              !UP_PRESSED && !DOWN_PRESSED && vy == 0)
             drill_left_prepare();
         break;
+    case SDLK_UP:
+        if (!propeller_sound_playing) {
+            SDL::play_sound_loop(propeller_sound_id);
+            propeller_sound_playing = true;
+        }
+        break;
+    }
+}
+
+void Digger::handle_key_up(SDL_Keycode k)
+{
+    if (k == SDLK_UP) {
+        SDL::stop_loop(propeller_sound_id);
+        propeller_sound_playing = false;
     }
 }
 

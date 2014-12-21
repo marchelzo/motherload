@@ -18,7 +18,10 @@ int main(int argc, char *argv[])
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT)
                 quit = true;
-            Digger::handle_key(e.key.keysym.sym);
+            else if (e.type == SDL_KEYDOWN)
+                Digger::handle_key_down(e.key.keysym.sym);
+            else if (e.type == SDL_KEYUP)
+                Digger::handle_key_up(e.key.keysym.sym);
         }
 
         SDL::render_clear();

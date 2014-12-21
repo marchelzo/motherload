@@ -1,10 +1,11 @@
 #include <cstdio>
 #include <string>
 #include <vector>
+#include <map>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-
+#include <SDL2/SDL_mixer.h>
 
 #include "sdl_wrapper.hh"
 
@@ -12,6 +13,8 @@
 static SDL_Window *window;
 static SDL_Renderer *renderer;
 static std::vector<SDL_Texture*> textures;
+static std::vector<Mix_Chunk*> sounds;
+static std::map<size_t, int> channels;
 static std::vector<SDL_Rect> dimensions;
 static size_t current_texture;
 
@@ -55,6 +58,11 @@ bool SDL::init()
 
     if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
         fprintf(stderr, "SDL_image could not initialize: %s\n", IMG_GetError());
+        return false;
+    }
+
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        fprintf(stderr, "SDL_mixer could not initialize: %s\n", Mix_GetError());
         return false;
     }
 
@@ -143,4 +151,28 @@ void SDL::render_texture(int x, int y)
     r.x = x;
     r.y = y;
     SDL_RenderCopy(renderer, textures[current_texture], &dimensions[current_texture], &r);
+}
+
+size_t SDL::load_sound(const std::string& path)
+{
+    sounds.push_back(Mix_LoadWAV(path.c_str()));
+    int channel = channels.size();
+    channels[sounds.size() - 1] = channel;
+    return sounds.size() - 1;
+}
+
+void SDL::play_sound(size_t id)
+{
+    Mix_PlayChannel(channels[id], sounds[id], 0);
+}
+
+void SDL::play_sound_loop(size_t id)
+{
+    channels[id] = id;
+    Mix_PlayChannel(channels[id], sounds[id], -1);
+}
+
+void SDL::stop_loop(size_t id)
+{
+    Mix_HaltChannel(channels[id]);
 }

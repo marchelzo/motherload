@@ -12,9 +12,13 @@ namespace SDL {
     void render_clear();
     void render_present();
     size_t load_texture(const std::string&);
+    size_t load_sound(const std::string&);
     bool set_texture(size_t);
     bool render_texture(size_t, int x, int y);
     bool render_texture(size_t, int x, int y, double angle);
     void render_texture(int x, int y);
+    void play_sound(size_t id);
+    void play_sound_loop(size_t id);
+    void stop_loop(size_t id);
 }
 
