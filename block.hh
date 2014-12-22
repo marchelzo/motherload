@@ -26,6 +26,7 @@ public:
     bool drilled();
     bool has_ore();
     void drill();
+    void reserve();
 
     static void load();
 };

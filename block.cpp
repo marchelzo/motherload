@@ -54,3 +54,10 @@ bool Block::has_ore()
 {
     return ore != Ore::NONE;
 }
+
+void Block::reserve()
+{
+    ore = Ore::NONE;
+    _drilled = false;
+    _drillable = false;
+}

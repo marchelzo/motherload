@@ -24,14 +24,25 @@ static std::string status_message {"Fuel Shop"};
 /* Static Helper Fuel Station Functions */
 static void attempt_purchase(int amount)
 {
-    if (Digger::money >= amount) {
-        Digger::money -= amount;
+    if (amount) {
+        if (Digger::money >= amount) {
+        int spent = std::min(amount, 10 - (int)Digger::fuel);
+            Digger::money -= spent;
+            status_message = "Purchased: " + std::to_string(spent) + " liters";
+            Digger::fuel += spent;
+            SDL::play_sound(fuel_sound_id);
+        } else {
+            status_message = "Insufficient funds";
+        }
+    } else { /* 0 was passed, so we attempt to fill the tank */
+        int spent = std::min(Digger::money, 10 - (int)Digger::fuel);
+        Digger::money -= spent;
+        Digger::fuel = (float) ((int)Digger::fuel + spent);
+        status_message = "Purchased: " + std::to_string(spent) + " liters";
         SDL::play_sound(fuel_sound_id);
-        status_message = "Purchased: " + std::to_string(amount) + " liters";
-    } else {
-        status_message = "Insufficient funds";
     }
 }
+/****************************************/
 
 
 /*********************************/
@@ -42,6 +53,12 @@ void FuelStation::load()
     fuel_interface_id      = SDL::load_texture("./assets/fuel_interface.png");
     fuel_status_message_id = SDL::texture_from_string(status_message, 255, 255, 0, 255);
     fuel_sound_id          = SDL::load_sound("./assets/fuel.wav");
+
+    /* ensure that the blocks beneath the fuel station are
+     * there, and are undrillable
+     */
+    World::blocks[3][4].reserve();
+    World::blocks[3][5].reserve();
 }
 
 void FuelStation::draw()
@@ -88,10 +105,18 @@ void FuelStation::click(int x, int y)
     /* the caller of this function has already checked
      * that the fuel interface is open
      */
+
     if (x > X_OFF + 30 && x < X_OFF + 160 && y > Y_OFF + 90 && y < Y_OFF + 220) 
         attempt_purchase(5);
-
-    if ((x - (496 + X_OFF)) * (x - (496 + X_OFF)) +
+    else if (x > X_OFF + 202 && x < X_OFF + 332 && y > Y_OFF + 90 && y < Y_OFF + 220) 
+        attempt_purchase(10);
+    else if (x > X_OFF + 374 && x < X_OFF + 504 && y > Y_OFF + 90 && y < Y_OFF + 220) 
+        attempt_purchase(25);
+    else if (x > X_OFF + 116 && x < X_OFF + 246 && y > Y_OFF + 236 && y < Y_OFF + 366) 
+        attempt_purchase(50);
+    else if (x > X_OFF + 296 && x < X_OFF + 426 && y > Y_OFF + 236 && y < Y_OFF + 366) 
+        attempt_purchase(0); /* 0 means fill the tank */
+    else if ((x - (496 + X_OFF)) * (x - (496 + X_OFF)) +
         (y - (40  + Y_OFF)) * (y - (40  + Y_OFF)) <= 18 * 18) {
             Digger::enable();
             interface_open = false;
@@ -101,3 +126,4 @@ void FuelStation::click(int x, int y)
              Digger::x += 1;
         }
 }
+/*********************************/
