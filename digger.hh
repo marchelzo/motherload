@@ -11,7 +11,17 @@ namespace Digger {
     int right();
     void load();
     void draw();
-    extern void (*update)();
+    void update();
     void handle_key_down(SDL_Keycode);
     void handle_key_up(SDL_Keycode);
+
+    /* Game variables */
+    extern const float MAX_HULL;
+    extern const float MAX_FUEL;
+
+    extern float hull;
+    extern float fuel;
+    extern int money;
+
+    extern bool alive;
 }

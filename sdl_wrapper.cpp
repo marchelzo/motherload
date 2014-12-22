@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "sdl_wrapper.hh"
 
@@ -17,6 +18,10 @@ static std::vector<Mix_Chunk*> sounds;
 static std::map<size_t, int> channels;
 static std::vector<SDL_Rect> dimensions;
 static size_t current_texture;
+
+/* TTF Font pointers for big and small versions of Mesmerize */
+static TTF_Font *big_font;
+static TTF_Font *small_font;
 
 static constexpr char WINDOW_TITLE[] = "Motherload";
 const int SDL::WINDOW_HEIGHT = 480;
@@ -52,9 +57,7 @@ bool SDL::init()
     if (!renderer) {
         fprintf(stderr, "Could not create renderer: %s\n", SDL_GetError());
         return false;
-    }
-
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    } else SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 
     if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
         fprintf(stderr, "SDL_image could not initialize: %s\n", IMG_GetError());
@@ -64,6 +67,14 @@ bool SDL::init()
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
         fprintf(stderr, "SDL_mixer could not initialize: %s\n", Mix_GetError());
         return false;
+    }
+
+    if (TTF_Init() == -1) {
+        fprintf(stderr, "SDL_ttf could not initialize: %s\n", TTF_GetError());
+        return false;
+    } else {
+        big_font = TTF_OpenFont("./assets/mesmerize.ttf", 28);
+        small_font = TTF_OpenFont("./assets/mesmerize.ttf", 18);
     }
 
     return true;
@@ -178,4 +189,40 @@ void SDL::play_sound_loop(size_t id)
 void SDL::stop_loop(size_t id)
 {
     Mix_HaltChannel(channels[id]);
+}
+
+size_t SDL::texture_from_string(const std::string& s, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+{
+    SDL_Color color = { r, g, b, a};
+    SDL_Surface *text_surface = TTF_RenderText_Solid(big_font, s.c_str(), color);
+    /* TODO: check text_surface == NULL ... maybe? */
+    textures.push_back(SDL_CreateTextureFromSurface(renderer, text_surface));
+    dimensions.push_back(create_rect(text_surface->w, text_surface->h));
+    SDL_FreeSurface(text_surface);
+    return textures.size() - 1;
+}
+
+size_t SDL::small_texture_from_string(const std::string& s, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+{
+    SDL_Color color = { r, g, b, a };
+    SDL_Surface *text_surface = TTF_RenderText_Solid(small_font, s.c_str(), color);
+    /* TODO: check text_surface == NULL ... maybe? */
+    textures.push_back(SDL_CreateTextureFromSurface(renderer, text_surface));
+    dimensions.push_back(create_rect(text_surface->w, text_surface->h));
+    SDL_FreeSurface(text_surface);
+    return textures.size() - 1;
+}
+
+void SDL::replace_texture(size_t old_id, size_t new_id)
+{
+    SDL_DestroyTexture(textures[old_id]);
+    textures[old_id] = textures[new_id];
+    textures.erase(textures.begin() + new_id);
+}
+
+void SDL::render_rect(const SDL_Rect *rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+{
+    SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    SDL_RenderFillRect(renderer, rect);
+    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 }
