@@ -215,14 +215,26 @@ size_t SDL::small_texture_from_string(const std::string& s, Uint8 r, Uint8 g, Ui
 
 void SDL::replace_texture(size_t old_id, size_t new_id)
 {
+    /* free the old texture */
     SDL_DestroyTexture(textures[old_id]);
+
+    /* replace the old texture with the new one and then remove the old copy of
+     * the new texture pointer from the textures vector
+     */
     textures[old_id] = textures[new_id];
     textures.erase(textures.begin() + new_id);
+
+    /* do the same thing for the dimensions vector */
+    dimensions[old_id] = dimensions[new_id];
+    dimensions.erase(dimensions.begin() + new_id);
+
 }
 
 void SDL::render_rect(const SDL_Rect *rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
     SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_RenderFillRect(renderer, rect);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 }

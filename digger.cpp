@@ -16,10 +16,10 @@
 const float Digger::MAX_HULL = 100.0;
 const float Digger::MAX_FUEL = 10.0;
 
-float Digger::fuel = 10.0;
-float Digger::hull = 20.0;
-
-bool Digger::alive = true;
+float Digger::fuel  = 10.0;
+float Digger::hull  = 20.0;
+int   Digger::money = 20;
+bool  Digger::alive = true;
 
 static float ax;
 static float ay;
@@ -37,7 +37,7 @@ static void drilling_left_update();
 static void drilling_down_update();
 static void drilling_right_update();
 static void explode_update();
-static void (*current_update)() = default_update;
+static void (*current_update)() = default_update; /* the current state (gets called on every frame) */
 /*********************************************/
 
 static size_t texture_id;
@@ -58,6 +58,7 @@ static size_t frames_since_last_rotate;
 static double drill_angle;
 static bool propeller_sound_playing;
 static bool exploding;
+static bool enabled = true;
 
 float Digger::x;
 float Digger::y;
@@ -146,6 +147,8 @@ static void clip()
 
 }
 
+/*============================================================================*/
+/***************** Digger update functions ************************************/
 static void default_update()
 {
     rotate_drill_and_propeller();
@@ -244,6 +247,10 @@ static void explode_update()
     
 }
 
+static void idle_update() {}
+/*============================================================================*/
+/***************** End update functions ***************************************/
+
 static void drill_down_prepare()
 {
     Digger::fuel -= 0.6;
@@ -321,7 +328,7 @@ void Digger::draw()
         SDL::render_texture(drill_ids[current_drill_id], (int) Digger::x + drill_x_off,
                             (int) Digger::y + 64 + drill_y_off - World::scroll_y, drill_angle);
     if (exploding)
-        SDL::render_texture(explosion_ids[current_explosion_id], (int) Digger::x - 32, (int) Digger::y - World::scroll_y - 32);
+        SDL::render_texture(explosion_ids[current_explosion_id], (int) Digger::x - 64, (int) Digger::y - World::scroll_y - 64);
 }
 
 void Digger::handle_key_down(SDL_Keycode k)
@@ -364,7 +371,12 @@ void Digger::handle_key_up(SDL_Keycode k)
         propeller_sound_playing = false;
     } else if (k == SDLK_e) {
         game_over();
+    } else if (k == SDLK_j) {
+        Digger::money -= 2;
+    } else if (k == SDLK_k) {
+        Digger::money += 2;
     }
+        
 }
 
 int Digger::bottom()
@@ -395,8 +407,20 @@ void Digger::update()
     /******************/
     /* game logic     */
 
-    Digger::fuel -= 0.0007;
+    if (enabled) Digger::fuel -= 0.0007;
     if (Digger::fuel < 0 && !exploding)
         game_over();
     /******************/
+}
+
+void Digger::enable()
+{
+    enabled = true;
+    current_update = default_update;
+}
+
+void Digger::disable()
+{
+    enabled = false;
+    current_update = idle_update;
 }

@@ -15,6 +15,11 @@ namespace Digger {
     void handle_key_down(SDL_Keycode);
     void handle_key_up(SDL_Keycode);
 
+    /* disable and re-enable Digger functionality               */
+    /* this is used for when one of the shop interfaces is open */
+    void enable();
+    void disable();
+
     /* Game variables */
     extern const float MAX_HULL;
     extern const float MAX_FUEL;
