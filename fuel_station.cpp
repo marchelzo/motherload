@@ -99,7 +99,7 @@ void FuelStation::draw_interface()
                         (SDL::WINDOW_WIDTH / 2)  - (540 / 2),
                         (SDL::WINDOW_HEIGHT / 2) - (400 / 2));
 
-    SDL::render_texture(fuel_status_message_id, 60, 60);
+    SDL::render_texture(fuel_status_message_id, 80, 60);
 }
 
 void FuelStation::click(int x, int y)
