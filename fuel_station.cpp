@@ -65,8 +65,9 @@ void FuelStation::draw()
 {
     /* return early if we are scrolled past the fuel station */
     if (World::scroll_y > 192) return;
+    if (World::scroll_x > 300) return;
 
-    SDL::render_texture(fuel_station_id, 260, 64 - World::scroll_y);
+    SDL::render_texture(fuel_station_id, 260 - World::scroll_x, 64 - World::scroll_y);
 }
 
 bool FuelStation::in_use()

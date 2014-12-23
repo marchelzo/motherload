@@ -79,6 +79,7 @@ static void game_over()
 {
     current_update = explode_update;
     exploding = true;
+    SDL::stop_all_sounds();
     SDL::play_sound(explosion_sound_id);
 }
 
@@ -148,8 +149,8 @@ static void clip()
     /* keep the digger inside the map */
     if (Digger::x < 0)
         Digger::x = 0;
-    else if (Digger::x + 64 > SDL::WINDOW_WIDTH)
-        Digger::x = SDL::WINDOW_WIDTH - 64;
+    else if (Digger::x + 64 >= World::MAP_WIDTH * 64)
+        Digger::x = (World::MAP_WIDTH - 1) * 64;
     if (Digger::y < 0) {
         Digger::y = 0;
         Digger::vy = 0;
@@ -326,23 +327,23 @@ void Digger::load()
 
 void Digger::draw()
 {
-    Digger::x += 7;
-
+    /* alias for the final calculated coordinates of the Digger */
+    int x_pos = (int) Digger::x - World::scroll_x + 7;
+    int y_pos = (int) Digger::y - World::scroll_y;
+    
     /* don't draw anything if the game is over */
     if (!Digger::alive) return;
 
-    SDL::render_texture(texture_id, (int) Digger::x, (int) Digger::y - World::scroll_y);
+    SDL::render_texture(texture_id, x_pos, y_pos);
 
     if (show_propeller)
-        SDL::render_texture(propeller_ids[current_prop_id], (int) Digger::x,
-                            (int) Digger::y - 54 - World::scroll_y);
+        SDL::render_texture(propeller_ids[current_prop_id], x_pos,
+                            y_pos - 54);
     else if (show_drill)
-        SDL::render_texture(drill_ids[current_drill_id], (int) Digger::x + drill_x_off,
-                            (int) Digger::y + 64 + drill_y_off - World::scroll_y, drill_angle);
+        SDL::render_texture(drill_ids[current_drill_id], x_pos + drill_x_off,
+                            y_pos+ 64 + drill_y_off, drill_angle);
     if (exploding)
-        SDL::render_texture(explosion_ids[current_explosion_id], (int) Digger::x - 64, (int) Digger::y - World::scroll_y - 64);
-
-    Digger::x -= 7;
+        SDL::render_texture(explosion_ids[current_explosion_id], x_pos - 64, y_pos - 64);
 }
 
 void Digger::handle_key_down(SDL_Keycode k)

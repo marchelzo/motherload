@@ -238,3 +238,8 @@ void SDL::render_rect(const SDL_Rect *rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 }
+
+void SDL::stop_all_sounds()
+{
+    Mix_HaltChannel(-1);
+}

@@ -25,5 +25,6 @@ namespace SDL {
     void play_sound(size_t id);
     void play_sound_loop(size_t id);
     void stop_loop(size_t id);
+    void stop_all_sounds();
 }
 
