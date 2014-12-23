@@ -1,7 +1,7 @@
-#include "digger.hh"
-#include "sdl_wrapper.hh"
-#include "world.hh"
-#include "block.hh"
+#include "digger.hpp"
+#include "sdl_wrapper.hpp"
+#include "world.hpp"
+#include "block.hpp"
 
 const int World::MAP_HEIGHT = 500;
 const int World::MAP_WIDTH  = 30;

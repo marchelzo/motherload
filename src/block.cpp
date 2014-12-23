@@ -1,7 +1,7 @@
 #include <string>
 
-#include "block.hh"
-#include "sdl_wrapper.hh"
+#include "block.hpp"
+#include "sdl_wrapper.hpp"
 
 static size_t ore_texture_ids[(int) Ore::NUM_ORE_TYPES];
 

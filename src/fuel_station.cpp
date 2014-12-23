@@ -1,7 +1,7 @@
-#include "fuel_station.hh"
-#include "sdl_wrapper.hh"
-#include "digger.hh"
-#include "world.hh"
+#include "fuel_station.hpp"
+#include "sdl_wrapper.hpp"
+#include "digger.hpp"
+#include "world.hpp"
 
 static bool interface_open;             /* is the fuel interface open? */
 

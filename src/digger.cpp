@@ -1,9 +1,9 @@
 #include <cmath>
 
-#include "digger.hh"
-#include "sdl_wrapper.hh"
-#include "world.hh"
-#include "block.hh"
+#include "digger.hpp"
+#include "sdl_wrapper.hpp"
+#include "world.hpp"
+#include "block.hpp"
 
 #define UP_PRESSED (key_states[SDL_SCANCODE_UP])
 #define DOWN_PRESSED (key_states[SDL_SCANCODE_DOWN])

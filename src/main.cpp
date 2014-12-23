@@ -1,8 +1,8 @@
-#include "sdl_wrapper.hh"
-#include "digger.hh"
-#include "world.hh"
-#include "hud.hh"
-#include "fuel_station.hh"
+#include "sdl_wrapper.hpp"
+#include "digger.hpp"
+#include "world.hpp"
+#include "hud.hpp"
+#include "fuel_station.hpp"
 
 #include <ctime>
 #include <SDL2/SDL.h>

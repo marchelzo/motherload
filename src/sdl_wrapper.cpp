@@ -8,7 +8,7 @@
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 
-#include "sdl_wrapper.hh"
+#include "sdl_wrapper.hpp"
 
 /* Global SDL State */
 static SDL_Window *window;

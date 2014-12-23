@@ -1,8 +1,8 @@
 #include <SDL2/SDL.h>
 
-#include "hud.hh"
-#include "sdl_wrapper.hh"
-#include "digger.hh"
+#include "hud.hpp"
+#include "sdl_wrapper.hpp"
+#include "digger.hpp"
 
 static size_t border_id;
 static size_t hull_text_id;
