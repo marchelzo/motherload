@@ -35,8 +35,13 @@ int main(int argc, char *argv[])
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT)
                 quit = true;
-            else if (e.type == SDL_KEYDOWN)
-                Digger::handle_key_down(e.key.keysym.sym);
+            else if (e.type == SDL_KEYDOWN) {
+                /* send key press to any buildings if necessary */
+                if (FuelStation::in_use())
+                    FuelStation::key_down(e.key.keysym.sym);
+                else /* if no interfaces are open, the Digger handles the key */
+                    Digger::handle_key_down(e.key.keysym.sym);
+            }
             else if (e.type == SDL_KEYUP)
                 Digger::handle_key_up(e.key.keysym.sym);
             else if (e.type == SDL_MOUSEBUTTONUP) {

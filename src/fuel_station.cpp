@@ -5,8 +5,16 @@
 
 static bool interface_open;             /* is the fuel interface open? */
 
+/* how many frames the interface has been open for */
+/* used to ensure that the interface is open for a */
+/* minimum of 30 frames                            */
+static int frames_interface_open;
+
 static const int X_OFF = SDL::WINDOW_WIDTH  / 2 - 540 / 2;
 static const int Y_OFF = SDL::WINDOW_HEIGHT / 2 - 400 / 2;
+
+static const int STATION_BEGIN_POS = 255;
+static const int STATION_END_POS   = 340;
 
 /* texture ids for the textures required by the fuel station */
 static size_t fuel_station_id;          /* 128 x 128 */
@@ -22,6 +30,21 @@ static std::string status_message {"Fuel Shop"};
 
 /****************************************/
 /* Static Helper Fuel Station Functions */
+static void close_interface()
+{
+    frames_interface_open = 0;
+    status_message = "Fuel Shop";
+    Digger::enable();
+    interface_open = false;
+    /* move the digger slightly so that the fuel interface
+     * doesn't immediately re-open
+     */
+    if (Digger::vx > 0)
+        Digger::x = STATION_END_POS + 5;
+    else
+        Digger::x = STATION_BEGIN_POS - 5;
+}
+
 static void attempt_purchase(int amount)
 {
     if (amount) {
@@ -40,6 +63,7 @@ static void attempt_purchase(int amount)
         Digger::fuel = (float) ((int)Digger::fuel + spent);
         status_message = "Purchased: " + std::to_string(spent) + " liters";
         SDL::play_sound(fuel_sound_id);
+        close_interface();
     }
 }
 /****************************************/
@@ -78,10 +102,14 @@ bool FuelStation::in_use()
 void FuelStation::update()
 {
     /* if the fuel interface is open, we don't need to do anything here */
-    if (interface_open) return;
+    /* other than increase the frame count                              */
+    if (interface_open) {
+        ++frames_interface_open;
+        return;
+    }
 
-    if ((int) Digger::x > 260 &&
-        (int) Digger::x < 280 &&
+    if ((int) Digger::x > STATION_BEGIN_POS &&
+        (int) Digger::x < STATION_END_POS &&
         (int) Digger::y == 128   ) {
 
         interface_open = true;
@@ -119,17 +147,36 @@ void FuelStation::click(int x, int y)
     else if (x > X_OFF + 296 && x < X_OFF + 426 && y > Y_OFF + 236 && y < Y_OFF + 366) 
         attempt_purchase(0); /* 0 means fill the tank */
     else if ((x - (496 + X_OFF)) * (x - (496 + X_OFF)) +
-        (y - (40  + Y_OFF)) * (y - (40  + Y_OFF)) <= 18 * 18) {
-            status_message = "Fuel Shop";
-            Digger::enable();
-            interface_open = false;
-            /* move the digger slightly so that the fuel interface
-             * doesn't immediately re-open
-             */
-            if (Digger::vx > 0)
-                Digger::x = 282;
-            else
-                Digger::x = 258;
-        }
+        (y - (40  + Y_OFF)) * (y - (40  + Y_OFF)) <= 18 * 18)
+        close_interface();
 }
+
+void FuelStation::key_down(SDL_Keycode k)
+{
+    /* the interface is necessarily open if this is called */
+
+    /* the point of handling keys is to allow the user to close the fuel
+     * interface by simply pressing the arrow keys. this makes the interface
+     * less annoying when you don't mean to use it
+     */
+
+     /* don't handle key presses unless the interface has been open for
+      * at least 30 frames. This avoids accidental closing of the interface
+      */
+      if (frames_interface_open < 30) return;
+
+
+    if (k == SDLK_RIGHT) {
+        Digger::vx = 1.0;
+        close_interface();
+    } else if (k == SDLK_LEFT) {
+        Digger::vx = -1.0;
+        close_interface();
+    } else if (k == SDLK_UP) {
+        Digger::y -= 10;
+        Digger::vy = 1.0;
+        close_interface();
+    }
+}
+
 /*********************************/

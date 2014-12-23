@@ -17,7 +17,7 @@ const float Digger::MAX_HULL = 100.0;
 const float Digger::MAX_FUEL = 10.0;
 
 float Digger::fuel  = 10.0;
-float Digger::hull  = 20.0;
+float Digger::hull  = 100.0;
 int   Digger::money = 20;
 bool  Digger::alive = true;
 /************************/
@@ -40,8 +40,9 @@ float Digger::y;
 
 
 static constexpr float MAX_SPEED = 5.0;
+static constexpr float MAX_FALL_SPEED = -7.0;
 static constexpr float ACCELERATION = 0.3;
-static constexpr float ACCELERATION_DUE_TO_GRAVITY = -0.3;
+static constexpr float ACCELERATION_DUE_TO_GRAVITY = -0.16;
 
 /*********************************************/
 /* Declarations for various update functions */
@@ -88,8 +89,10 @@ static void normalize_velocity()
     if (std::abs(Digger::vx) > MAX_SPEED)
         Digger::vx = copysignf(MAX_SPEED, Digger::vx);
 
-    if (std::abs(Digger::vy) > MAX_SPEED)
-        Digger::vy = copysignf(MAX_SPEED, Digger::vy);
+    if (Digger::vy > MAX_SPEED)
+        Digger::vy = MAX_SPEED;
+    else if (Digger::vy < MAX_FALL_SPEED)
+        Digger::vy = MAX_FALL_SPEED;
 }
 
 static void rotate_drill_and_propeller()
@@ -132,6 +135,8 @@ static void clip()
     should_clip |= !World::blocks[bottom_pos][left_pos].drilled() && (right_pos*64 - Digger::left() > 12);
     should_clip |= !World::blocks[bottom_pos][right_pos].drilled() && (Digger::right() - right_pos*64 > 12);
     if (should_clip) {
+        /* apply falling damage if the Digger was moving quickly */
+        if (Digger::vy < -6.0) Digger::hull -= 8;
         Digger::y = 64 * top_pos;
         Digger::vy = 0;
         Digger::vx *= 0.9; if (std::abs(Digger::vx) < 0.1) Digger::vx = 0;
