@@ -10,6 +10,7 @@ static bool interface_open;             /* is the fuel interface open? */
 /* minimum of 30 frames                            */
 static int frames_interface_open;
 
+/* aliases for offsets of interface window */
 static const int X_OFF = SDL::WINDOW_WIDTH  / 2 - 540 / 2;
 static const int Y_OFF = SDL::WINDOW_HEIGHT / 2 - 400 / 2;
 
@@ -88,8 +89,8 @@ void FuelStation::load()
 void FuelStation::draw()
 {
     /* return early if we are scrolled past the fuel station */
-    if (World::scroll_y > 192) return;
-    if (World::scroll_x > 300) return;
+    if (World::scroll_y > 220) return;
+    if (World::scroll_x > 360) return;
 
     SDL::render_texture(fuel_station_id, 260 - World::scroll_x, 64 - World::scroll_y);
 }

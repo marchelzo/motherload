@@ -30,3 +30,7 @@ public:
 
     static void load();
 };
+
+namespace ORE {
+    int value_of(Ore);
+}

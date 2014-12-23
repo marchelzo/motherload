@@ -1,4 +1,5 @@
 #include <cmath>
+#include <map>
 
 #include "digger.hpp"
 #include "sdl_wrapper.hpp"
@@ -11,6 +12,15 @@
 #define LEFT_PRESSED (key_states[SDL_SCANCODE_LEFT])
 
 
+
+/**** Inventory implementation *******/
+int Digger::ores[static_cast<int>(Ore::NUM_ORE_TYPES)];
+//std::map<Item,int> Digger::items;
+void Digger::acquire(Ore o) {++ores[static_cast<int>(o)];}
+//void Digger::acquire(Item);
+/*******************************************/
+
+
 /************************/
 /* game variables       */
 const float Digger::MAX_HULL = 100.0;
@@ -20,6 +30,9 @@ float Digger::fuel  = 10.0;
 float Digger::hull  = 100.0;
 int   Digger::money = 20;
 bool  Digger::alive = true;
+
+
+
 /************************/
 
 

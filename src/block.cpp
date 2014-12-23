@@ -2,6 +2,7 @@
 
 #include "block.hpp"
 #include "sdl_wrapper.hpp"
+#include "digger.hpp"
 
 static size_t ore_texture_ids[(int) Ore::NUM_ORE_TYPES];
 
@@ -48,6 +49,8 @@ bool Block::drilled()
 void Block::drill()
 {
     _drilled = true;
+    if (ore != Ore::NONE)
+        Digger::acquire(ore);
 }
 
 bool Block::has_ore()
@@ -61,3 +64,29 @@ void Block::reserve()
     _drilled = false;
     _drillable = false;
 }
+
+
+
+
+
+
+/************ ORE FUNCTIONS *****/
+int ORE::value_of(Ore o)
+{
+    if (o == Ore::COPPER)
+        return 30;
+    else if (o == Ore::TIN)
+        return 50;
+    else if (o == Ore::IRON)
+        return 100;
+    else if (o == Ore::SILVER)
+        return 250;
+    else if (o == Ore::GOLD)
+        return 500;
+    else if (o == Ore::RUBY)
+        return 1000;
+    else if (o == Ore::DIAMOND)
+        return 2500;
+    else return 0;
+}
+/********************************/

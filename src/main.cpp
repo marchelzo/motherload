@@ -3,6 +3,7 @@
 #include "world.hpp"
 #include "hud.hpp"
 #include "fuel_station.hpp"
+#include "mineral_processor.hpp"
 
 #include <ctime>
 #include <SDL2/SDL.h>
@@ -26,6 +27,7 @@ int main(int argc, char *argv[])
     Digger::load();
     HUD::load();
     FuelStation::load();
+    MineralProcessor::load();
 
     size_t test_text_id = SDL::small_texture_from_string("Testing this: 234", 255, 0, 0, 255);
 
@@ -59,9 +61,11 @@ int main(int argc, char *argv[])
 
         /* draw the various buildings */
         FuelStation::draw();
+        MineralProcessor::draw();
 
-        /* update the fuel station (see if the Digger is trying to use it) */
+        /* update the buildings (see if the Digger is trying to use them) */
         FuelStation::update();
+        MineralProcessor::update();
 
         /* update the Digger's state, and then draw it */
         Digger::update();

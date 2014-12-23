@@ -1,6 +1,8 @@
-#pragma once
-
 #include <SDL2/SDL.h>
+#include <map>
+#include "block.hpp"
+
+#pragma once
 
 namespace Digger {
     extern float x;
@@ -32,4 +34,10 @@ namespace Digger {
     extern int money;
 
     extern bool alive;
+    
+    extern int ores[static_cast<int>(Ore::NUM_ORE_TYPES)];
+    //extern std::map<Item,int> items;
+
+    void acquire(Ore);
+    //void acquire(Item);
 }
