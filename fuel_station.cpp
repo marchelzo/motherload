@@ -29,7 +29,7 @@ static void attempt_purchase(int amount)
         int spent = std::min(amount, 10 - (int)Digger::fuel);
             Digger::money -= spent;
             status_message = "Purchased: " + std::to_string(spent) + " liters";
-            Digger::fuel += spent;
+            Digger::fuel = (float) ((int)Digger::fuel + spent);
             SDL::play_sound(fuel_sound_id);
         } else {
             status_message = "Insufficient funds";
