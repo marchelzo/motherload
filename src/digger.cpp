@@ -79,6 +79,7 @@ static int drill_y_off;
 static size_t drill_sound_id;
 static size_t propeller_sound_id;
 static size_t explosion_sound_id;
+static size_t falling_damage_sound_id;
 static bool show_propeller;
 static bool show_drill;
 static size_t frames_since_last_rotate;
@@ -95,6 +96,14 @@ static void game_over()
     exploding = true;
     SDL::stop_all_sounds();
     SDL::play_sound(explosion_sound_id);
+}
+
+static void apply_falling_damage()
+{
+    if (Digger::vy < -6.0) {
+        Digger::hull -= 7.0;
+        SDL::play_sound(falling_damage_sound_id);
+    }
 }
 
 static void normalize_velocity()
@@ -149,7 +158,7 @@ static void clip()
     should_clip |= !World::blocks[bottom_pos][right_pos].drilled() && (Digger::right() - right_pos*64 > 12);
     if (should_clip) {
         /* apply falling damage if the Digger was moving quickly */
-        if (Digger::vy < -6.0) Digger::hull -= 8;
+        apply_falling_damage();
         Digger::y = 64 * top_pos;
         Digger::vy = 0;
         Digger::vx *= 0.9; if (std::abs(Digger::vx) < 0.1) Digger::vx = 0;
@@ -341,6 +350,7 @@ void Digger::load()
     drill_sound_id = SDL::load_sound("./assets/drill.wav");
     propeller_sound_id = SDL::load_sound("./assets/disco.wav");
     explosion_sound_id = SDL::load_sound("./assets/explosion.wav");
+    falling_damage_sound_id = SDL::load_sound("./assets/falling_damage.wav");
 }
 
 void Digger::draw()
