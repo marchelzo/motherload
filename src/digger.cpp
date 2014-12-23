@@ -12,15 +12,6 @@
 #define LEFT_PRESSED (key_states[SDL_SCANCODE_LEFT])
 
 
-
-/**** Inventory implementation *******/
-int Digger::ores[static_cast<int>(Ore::NUM_ORE_TYPES)];
-//std::map<Item,int> Digger::items;
-void Digger::acquire(Ore o) {++ores[static_cast<int>(o)];}
-//void Digger::acquire(Item);
-/*******************************************/
-
-
 /************************/
 /* game variables       */
 const float Digger::MAX_HULL = 100.0;
@@ -30,9 +21,6 @@ float Digger::fuel  = 10.0;
 float Digger::hull  = 100.0;
 int   Digger::money = 20;
 bool  Digger::alive = true;
-
-
-
 /************************/
 
 
@@ -52,10 +40,12 @@ float Digger::y;
 /********************************/
 
 
+/*** Physical Constants ***********/
 static constexpr float MAX_SPEED = 5.0;
 static constexpr float MAX_FALL_SPEED = -7.0;
 static constexpr float ACCELERATION = 0.3;
 static constexpr float ACCELERATION_DUE_TO_GRAVITY = -0.16;
+/**********************************/
 
 /*********************************************/
 /* Declarations for various update functions */
@@ -80,6 +70,7 @@ static size_t drill_sound_id;
 static size_t propeller_sound_id;
 static size_t explosion_sound_id;
 static size_t falling_damage_sound_id;
+static size_t ore_acquired_sound_id;
 static bool show_propeller;
 static bool show_drill;
 static size_t frames_since_last_rotate;
@@ -87,6 +78,17 @@ static double drill_angle;
 static bool propeller_sound_playing;
 static bool exploding;
 static bool enabled = true;
+
+
+/**** Inventory implementation *******/
+int Digger::ores[static_cast<int>(Ore::NUM_ORE_TYPES)];
+//std::map<Item,int> Digger::items;
+void Digger::acquire(Ore o) {
+    ++ores[static_cast<int>(o)];
+    SDL::play_sound(ore_acquired_sound_id);
+}
+//void Digger::acquire(Item);
+/*******************************************/
 
 
 /* static helper functions */
@@ -346,11 +348,12 @@ void Digger::load()
     explosion_ids[9] = SDL::load_texture("./assets/explosion10.png");
 
     
-    /* Load sound effects for drill, propeller, and explosion */
-    drill_sound_id = SDL::load_sound("./assets/drill.wav");
-    propeller_sound_id = SDL::load_sound("./assets/disco.wav");
-    explosion_sound_id = SDL::load_sound("./assets/explosion.wav");
+    /* Load sound effects for the Digger */
+    drill_sound_id          = SDL::load_sound("./assets/drill.wav");
+    propeller_sound_id      = SDL::load_sound("./assets/disco.wav");
+    explosion_sound_id      = SDL::load_sound("./assets/explosion.wav");
     falling_damage_sound_id = SDL::load_sound("./assets/falling_damage.wav");
+    ore_acquired_sound_id   = SDL::load_sound("./assets/ore_acquired.wav");
 }
 
 void Digger::draw()
