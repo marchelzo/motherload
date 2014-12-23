@@ -20,11 +20,24 @@ float Digger::fuel  = 10.0;
 float Digger::hull  = 20.0;
 int   Digger::money = 20;
 bool  Digger::alive = true;
+/************************/
 
+
+/********************************/
+/* digger acceleration (static) */
 static float ax;
 static float ay;
-static float vx;
-static float vy;
+/********************************/
+
+
+/********************************/
+/* Digger position and velocity */
+float Digger::vx;
+float Digger::vy;
+float Digger::x;
+float Digger::y;
+/********************************/
+
 
 static constexpr float MAX_SPEED = 5.0;
 static constexpr float ACCELERATION = 0.3;
@@ -60,9 +73,6 @@ static bool propeller_sound_playing;
 static bool exploding;
 static bool enabled = true;
 
-float Digger::x;
-float Digger::y;
-
 
 /* static helper functions */
 static void game_over()
@@ -74,11 +84,11 @@ static void game_over()
 
 static void normalize_velocity()
 {
-    if (std::abs(vx) > MAX_SPEED)
-        vx = copysignf(MAX_SPEED, vx);
+    if (std::abs(Digger::vx) > MAX_SPEED)
+        Digger::vx = copysignf(MAX_SPEED, Digger::vx);
 
-    if (std::abs(vy) > MAX_SPEED)
-        vy = copysignf(MAX_SPEED, vy);
+    if (std::abs(Digger::vy) > MAX_SPEED)
+        Digger::vy = copysignf(MAX_SPEED, Digger::vy);
 }
 
 static void rotate_drill_and_propeller()
@@ -104,7 +114,7 @@ static void clip()
     should_clip |= !World::blocks[bottom_pos][left_pos].drilled() && (Digger::bottom() - bottom_pos*64 > 12);
     if (should_clip) {
         Digger::x = 64 * right_pos;
-        vx = 0;
+        Digger::vx = 0;
     }
 
     /* RIGHT */
@@ -113,7 +123,7 @@ static void clip()
     should_clip |= !World::blocks[bottom_pos][right_pos].drilled() && (Digger::bottom() - bottom_pos*64 > 12);
     if (should_clip) {
         Digger::x = 64 * left_pos;
-        vx = 0;
+        Digger::vx = 0;
     }
 
     /* BOTTOM */
@@ -122,8 +132,8 @@ static void clip()
     should_clip |= !World::blocks[bottom_pos][right_pos].drilled() && (Digger::right() - right_pos*64 > 12);
     if (should_clip) {
         Digger::y = 64 * top_pos;
-        vy = 0;
-        vx *= 0.9; if (std::abs(vx) < 0.1) vx = 0;
+        Digger::vy = 0;
+        Digger::vx *= 0.9; if (std::abs(Digger::vx) < 0.1) Digger::vx = 0;
     }
 
     /* TOP */
@@ -132,7 +142,7 @@ static void clip()
     should_clip |= !World::blocks[top_pos][right_pos].drilled() && (Digger::right() - right_pos*64 > 12);
     if (should_clip) {
         Digger::y = 64 * bottom_pos;
-        vy = 0;
+        Digger::vy = 0;
     }
 
     /* keep the digger inside the map */
@@ -142,7 +152,7 @@ static void clip()
         Digger::x = SDL::WINDOW_WIDTH - 64;
     if (Digger::y < 0) {
         Digger::y = 0;
-        vy = 0;
+        Digger::vy = 0;
     }
 
 }
@@ -168,13 +178,13 @@ static void default_update()
         ax = -ACCELERATION;
     } else ax = 0.0;
 
-    vx += ax;
-    vy += ay;
+    Digger::vx += ax;
+    Digger::vy += ay;
 
     normalize_velocity();
 
-    Digger::x += vx;
-    Digger::y -= vy;
+    Digger::x += Digger::vx;
+    Digger::y -= Digger::vy;
 
     clip();
 
@@ -260,7 +270,7 @@ static void drill_down_prepare()
     drill_angle = 0.0;
     drill_x_off = 0;
     drill_y_off = 0;
-    vx = 0;
+    Digger::vx = 0;
 }
 
 static void drill_right_prepare()
@@ -316,6 +326,8 @@ void Digger::load()
 
 void Digger::draw()
 {
+    Digger::x += 7;
+
     /* don't draw anything if the game is over */
     if (!Digger::alive) return;
 
@@ -329,6 +341,8 @@ void Digger::draw()
                             (int) Digger::y + 64 + drill_y_off - World::scroll_y, drill_angle);
     if (exploding)
         SDL::render_texture(explosion_ids[current_explosion_id], (int) Digger::x - 64, (int) Digger::y - World::scroll_y - 64);
+
+    Digger::x -= 7;
 }
 
 void Digger::handle_key_down(SDL_Keycode k)
@@ -340,19 +354,19 @@ void Digger::handle_key_down(SDL_Keycode k)
     case SDLK_DOWN:
         if (!(World::blocks[Digger::bottom() / 64][(Digger::left() + 32) / 64].drilled()) &&
              (World::blocks[Digger::bottom() / 64][(Digger::left() + 32) / 64].drillable()) &&
-             !LEFT_PRESSED && !RIGHT_PRESSED && std::abs(vx) < 0.3)
+             !LEFT_PRESSED && !RIGHT_PRESSED && std::abs(Digger::vx) < 0.3)
              drill_down_prepare();
         break;
     case SDLK_RIGHT:
         if (!(World::blocks[(Digger::top() + 32) / 64][Digger::right() / 64].drilled()) &&
              (World::blocks[(Digger::top() + 32) / 64][Digger::right() / 64].drillable()) &&
-             !UP_PRESSED && !DOWN_PRESSED && vy == 0)
+             !UP_PRESSED && !DOWN_PRESSED && Digger::vy == 0)
              drill_right_prepare();
         break;
     case SDLK_LEFT:
         if (!(World::blocks[(Digger::top() + 32) / 64][(Digger::left() - 1) / 64].drilled()) &&
              (World::blocks[(Digger::top() + 32) / 64][(Digger::left() - 1) / 64].drillable()) &&
-             !UP_PRESSED && !DOWN_PRESSED && vy == 0)
+             !UP_PRESSED && !DOWN_PRESSED && Digger::vy == 0)
             drill_left_prepare();
         break;
     case SDLK_UP:
@@ -379,25 +393,11 @@ void Digger::handle_key_up(SDL_Keycode k)
         
 }
 
-int Digger::bottom()
-{
-    return (int) Digger::y + 64;
-}
-
-int Digger::top()
-{
-    return (int) Digger::y;
-}
-
-int Digger::left()
-{
-    return (int) Digger::x;
-}
-
-int Digger::right()
-{
-    return (int) Digger::x + 64;
-}
+/* Helper functions for getting the position of various edges of the Digger's model */
+int Digger::bottom() { return (int) Digger::y + 64; }
+int Digger::top() { return (int) Digger::y; }
+int Digger::left() { return (int) Digger::x; }
+int Digger::right() { return (int) Digger::x + 64; }
 
 void Digger::update()
 {
@@ -413,6 +413,10 @@ void Digger::update()
     /******************/
 }
 
+/* These functions are called by buildings (repair shop, fuel station, etc.)
+ * to disable the Digger while their interfaces are in use, and then
+ * re-enable it when the interface is closed
+ */
 void Digger::enable()
 {
     enabled = true;

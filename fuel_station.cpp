@@ -66,7 +66,7 @@ void FuelStation::draw()
     /* return early if we are scrolled past the fuel station */
     if (World::scroll_y > 192) return;
 
-    SDL::render_texture(fuel_station_id, 260, 66 - World::scroll_y);
+    SDL::render_texture(fuel_station_id, 260, 64 - World::scroll_y);
 }
 
 bool FuelStation::in_use()
@@ -79,7 +79,8 @@ void FuelStation::update()
     /* if the fuel interface is open, we don't need to do anything here */
     if (interface_open) return;
 
-    if ((int) Digger::x == 270 &&
+    if ((int) Digger::x > 260 &&
+        (int) Digger::x < 280 &&
         (int) Digger::y == 128   ) {
 
         interface_open = true;
@@ -118,12 +119,16 @@ void FuelStation::click(int x, int y)
         attempt_purchase(0); /* 0 means fill the tank */
     else if ((x - (496 + X_OFF)) * (x - (496 + X_OFF)) +
         (y - (40  + Y_OFF)) * (y - (40  + Y_OFF)) <= 18 * 18) {
+            status_message = "Fuel Shop";
             Digger::enable();
             interface_open = false;
             /* move the digger slightly so that the fuel interface
              * doesn't immediately re-open
              */
-             Digger::x += 1;
+            if (Digger::vx > 0)
+                Digger::x = 282;
+            else
+                Digger::x = 258;
         }
 }
 /*********************************/

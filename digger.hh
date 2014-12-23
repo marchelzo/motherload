@@ -5,6 +5,9 @@
 namespace Digger {
     extern float x;
     extern float y;
+    extern float vx;
+    extern float vy;
+
     int bottom();
     int top();
     int left();
