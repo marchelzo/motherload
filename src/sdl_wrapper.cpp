@@ -10,6 +10,25 @@
 
 #include "sdl_wrapper.hpp"
 
+/* animation data structure */
+struct Animation {
+    const size_t frame_duration;
+    const size_t frames;
+    const size_t first_frame_id;
+    size_t current_frame;
+    size_t frame_count;
+    size_t times_played;
+    Animation(size_t frame_duration, size_t frames, size_t first_frame_id):
+        frame_duration{frame_duration},
+        frames{frames},
+        first_frame_id{first_frame_id},
+        frame_count{0},
+        current_frame{0},
+        times_played{0}
+    {}
+};
+/****************************/
+
 /* Global SDL State */
 static SDL_Window *window;
 static SDL_Renderer *renderer;
@@ -17,6 +36,7 @@ static std::vector<SDL_Texture*> textures;
 static std::vector<Mix_Chunk*> sounds;
 static std::map<size_t, int> channels;
 static std::vector<SDL_Rect> dimensions;
+static std::vector<Animation> animations;
 static size_t current_texture;
 
 /* TTF Font pointers for big and small versions of Mesmerize */
@@ -242,4 +262,32 @@ void SDL::render_rect(const SDL_Rect *rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 void SDL::stop_all_sounds()
 {
     Mix_HaltChannel(-1);
+}
+
+size_t SDL::load_animation(const std::string& path, size_t frames, size_t frame_duration)
+{
+    size_t first_frame_id = SDL::load_texture(path + "1.png");
+    for (unsigned int i = 2; i <= frames; ++i)
+        SDL::load_texture(path + std::to_string(i) + ".png");
+    animations.emplace_back(frame_duration, frames, first_frame_id);
+    return animations.size() - 1;
+}
+
+size_t SDL::render_animation(size_t id, int x, int y)
+{
+    Animation& a = animations[id];
+    SDL::render_texture(a.first_frame_id + a.current_frame, x, y);
+    if (++a.frame_count % a.frame_duration == 0) {
+        if (a.current_frame + 1 == a.frames) {
+            a.current_frame = 0;
+            ++a.times_played;
+        } else ++a.current_frame;
+        a.frame_count = 0;
+    }
+    return a.times_played;
+}
+
+size_t SDL::times_played(size_t animation_id)
+{
+    return animations[animation_id].times_played;
 }

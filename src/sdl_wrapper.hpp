@@ -12,6 +12,7 @@ namespace SDL {
     void quit();
     void render_clear();
     void render_present();
+    size_t load_animation(const std::string& path, size_t frames, size_t frame_dration);
     size_t load_texture(const std::string&);
     size_t texture_from_string(const std::string&, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
     size_t small_texture_from_string(const std::string&, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
@@ -19,8 +20,10 @@ namespace SDL {
     bool set_texture(size_t);
     bool render_texture(size_t, int x, int y);
     bool render_texture(size_t, int x, int y, double angle);
-    void replace_texture(size_t, size_t);
     void render_texture(int x, int y);
+    size_t render_animation(size_t id, int x, int y);
+    size_t times_played(size_t animation_id);
+    void replace_texture(size_t, size_t);
     void render_rect(const SDL_Rect *rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
     void play_sound(size_t id);
     void play_sound_loop(size_t id);

@@ -4,6 +4,7 @@
 #include "hud.hpp"
 #include "fuel_station.hpp"
 #include "mineral_processor.hpp"
+#include "repair_shop.hpp"
 
 #include <ctime>
 #include <SDL2/SDL.h>
@@ -28,8 +29,8 @@ int main(int argc, char *argv[])
     HUD::load();
     FuelStation::load();
     MineralProcessor::load();
+    RepairShop::load();
 
-    size_t test_text_id = SDL::small_texture_from_string("Testing this: 234", 255, 0, 0, 255);
 
     SDL_Event e;
     bool quit{};
@@ -41,7 +42,7 @@ int main(int argc, char *argv[])
                 /* send key press to any buildings if necessary */
                 if (FuelStation::in_use())
                     FuelStation::key_down(e.key.keysym.sym);
-                else /* if no interfaces are open, the Digger handles the key */
+                else /* no interfaces are open, so the Digger handles the key */
                     Digger::handle_key_down(e.key.keysym.sym);
             }
             else if (e.type == SDL_KEYUP)
@@ -62,6 +63,7 @@ int main(int argc, char *argv[])
         /* draw the various buildings */
         FuelStation::draw();
         MineralProcessor::draw();
+        RepairShop::draw();
 
         /* update the buildings (see if the Digger is trying to use them) */
         FuelStation::update();

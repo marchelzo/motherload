@@ -60,7 +60,7 @@ static void (*current_update)() = default_update; /* the current state (gets cal
 static size_t texture_id;
 static size_t propeller_ids[3];
 static size_t drill_ids[2];
-static size_t explosion_ids[10];
+static size_t explosion_id;
 static size_t current_prop_id;
 static size_t current_drill_id;
 static size_t current_explosion_id;
@@ -277,14 +277,9 @@ static void drilling_down_update()
 
 static void explode_update()
 {
-    static int frames;
-    if (++frames % 3 == 0 && frames) ++current_explosion_id;
-
-    /* check to see if we are done the explosion animation */
-    if (current_explosion_id == 10) {
+    /* end the game if the explosion animation has finished */
+    if (SDL::times_played(explosion_id) == 1)
         Digger::alive = false;
-    }
-    
 }
 
 static void idle_update() {}
@@ -336,17 +331,7 @@ void Digger::load()
     propeller_ids[2] = SDL::load_texture("./assets/prop3.png");
     drill_ids[0]     = SDL::load_texture("./assets/drill1.png");
     drill_ids[1]     = SDL::load_texture("./assets/drill2.png");
-    explosion_ids[0] = SDL::load_texture("./assets/explosion1.png");
-    explosion_ids[1] = SDL::load_texture("./assets/explosion2.png");
-    explosion_ids[2] = SDL::load_texture("./assets/explosion3.png");
-    explosion_ids[3] = SDL::load_texture("./assets/explosion4.png");
-    explosion_ids[4] = SDL::load_texture("./assets/explosion5.png");
-    explosion_ids[5] = SDL::load_texture("./assets/explosion6.png");
-    explosion_ids[6] = SDL::load_texture("./assets/explosion7.png");
-    explosion_ids[7] = SDL::load_texture("./assets/explosion8.png");
-    explosion_ids[8] = SDL::load_texture("./assets/explosion9.png");
-    explosion_ids[9] = SDL::load_texture("./assets/explosion10.png");
-
+    explosion_id     = SDL::load_animation("./assets/explosion", 10, 3);
     
     /* Load sound effects for the Digger */
     drill_sound_id          = SDL::load_sound("./assets/drill.wav");
@@ -374,7 +359,7 @@ void Digger::draw()
         SDL::render_texture(drill_ids[current_drill_id], x_pos + drill_x_off,
                             y_pos+ 64 + drill_y_off, drill_angle);
     if (exploding)
-        SDL::render_texture(explosion_ids[current_explosion_id], x_pos - 64, y_pos - 64);
+        SDL::render_animation(explosion_id, x_pos - 64, y_pos - 64);
 }
 
 void Digger::handle_key_down(SDL_Keycode k)
