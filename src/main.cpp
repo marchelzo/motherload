@@ -5,6 +5,7 @@
 #include "fuel_station.hpp"
 #include "mineral_processor.hpp"
 #include "repair_shop.hpp"
+#include "upgrade.hpp"
 
 #include <ctime>
 #include <SDL2/SDL.h>
@@ -30,6 +31,7 @@ int main(int argc, char *argv[])
     FuelStation::load();
     MineralProcessor::load();
     RepairShop::load();
+    Upgrade::load();
 
 
     SDL_Event e;
@@ -64,6 +66,7 @@ int main(int argc, char *argv[])
         FuelStation::draw();
         MineralProcessor::draw();
         RepairShop::draw();
+        Upgrade::draw();
 
         /* update the buildings (see if the Digger is trying to use them) */
         FuelStation::update();
