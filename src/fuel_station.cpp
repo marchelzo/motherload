@@ -50,20 +50,26 @@ static void attempt_purchase(int amount)
 {
     if (amount) {
         if (Digger::money >= amount) {
-        int spent = std::min(amount, 10 - (int)Digger::fuel);
-            Digger::money -= spent;
-            status_message = "Purchased: " + std::to_string(spent) + " liters";
-            Digger::fuel = (float) ((int)Digger::fuel + spent);
-            SDL::play_sound(fuel_sound_id);
+            int spent = std::min(amount, (int) (Digger::max_fuel - Digger::fuel));
+            if (spent) {
+                Digger::money -= spent;
+                status_message = "Purchased: " + std::to_string(spent) + " liters";
+                Digger::fuel = (float) ((int)Digger::fuel + spent);
+                SDL::play_sound(fuel_sound_id);
+            } else {
+                status_message = "Tank is already full";
+            }
         } else {
             status_message = "Insufficient funds";
         }
     } else { /* 0 was passed, so we attempt to fill the tank */
-        int spent = std::min(Digger::money, 10 - (int)Digger::fuel);
-        Digger::money -= spent;
-        Digger::fuel = (float) ((int)Digger::fuel + spent);
-        status_message = "Purchased: " + std::to_string(spent) + " liters";
-        SDL::play_sound(fuel_sound_id);
+        int spent = std::min(Digger::money, (int) (Digger::max_fuel - Digger::fuel));
+        if (spent) {
+            Digger::money -= spent;
+            Digger::fuel = (float) ((int)Digger::fuel + spent);
+            status_message = "Purchased: " + std::to_string(spent) + " liters";
+            SDL::play_sound(fuel_sound_id);
+        } 
         close_interface();
     }
 }

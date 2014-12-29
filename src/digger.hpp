@@ -26,10 +26,10 @@ namespace Digger {
     void disable();
 
     /* Game variables */
-    extern const float MAX_HULL;
-    extern const float MAX_FUEL;
+    extern int max_hull;
+    extern float max_fuel;
 
-    extern float hull;
+    extern int hull;
     extern float fuel;
     extern int money;
 

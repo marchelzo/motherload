@@ -14,11 +14,11 @@
 
 /************************/
 /* game variables       */
-const float Digger::MAX_HULL = 100.0;
-const float Digger::MAX_FUEL = 10.0;
+int   Digger::max_hull = 100;
+float Digger::max_fuel = 10.0;
 
 float Digger::fuel  = 10.0;
-float Digger::hull  = 100.0;
+int Digger::hull  = 100;
 int   Digger::money = 20;
 bool  Digger::alive = true;
 /************************/
@@ -103,7 +103,7 @@ static void game_over()
 static void apply_falling_damage()
 {
     if (Digger::vy < -6.0) {
-        Digger::hull -= 7.0;
+        Digger::hull -= 7;
         SDL::play_sound(falling_damage_sound_id);
     }
 }

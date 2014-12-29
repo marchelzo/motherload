@@ -15,9 +15,6 @@
  */
 static int frames_after_death = 60;
 
-static int mouse_x;
-static int mouse_y;
-
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
@@ -33,10 +30,13 @@ int main(int argc, char *argv[])
     RepairShop::load();
     Upgrade::load();
 
-
     SDL_Event e;
     bool quit{};
     while (!quit && frames_after_death) {
+
+        /* update the mouse coordinates */
+        SDL::update_mouse_coords();
+
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT)
                 quit = true;
@@ -50,8 +50,9 @@ int main(int argc, char *argv[])
             else if (e.type == SDL_KEYUP)
                 Digger::handle_key_up(e.key.keysym.sym);
             else if (e.type == SDL_MOUSEBUTTONUP) {
-                SDL_GetMouseState(&mouse_x, &mouse_y);
-                if (FuelStation::in_use()) FuelStation::click(mouse_x, mouse_y);
+                if (FuelStation::in_use()) FuelStation::click(SDL::mouse_x, SDL::mouse_y);
+                else if (RepairShop::in_use()) RepairShop::click(SDL::mouse_x, SDL::mouse_y);
+                else if (Upgrade::in_use()) Upgrade::click(SDL::mouse_x, SDL::mouse_y);
             }
                 
         }
@@ -71,14 +72,21 @@ int main(int argc, char *argv[])
         /* update the buildings (see if the Digger is trying to use them) */
         FuelStation::update();
         MineralProcessor::update();
+        RepairShop::update();
+        Upgrade::update();
 
         /* update the Digger's state, and then draw it */
         Digger::update();
         Digger::draw();
 
         /* draw the shop interfaces if they are open */
-        if (FuelStation::in_use())
+        if (FuelStation::in_use()) {
             FuelStation::draw_interface();
+        } else if (RepairShop::in_use()) {
+            RepairShop::draw_interface();
+        } else if (Upgrade::in_use()) {
+            Upgrade::draw_interface();
+        }
 
         /* update the world state, and draw the HUD elements */
         World::update();

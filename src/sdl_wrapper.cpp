@@ -48,6 +48,9 @@ const int SDL::WINDOW_HEIGHT = 480;
 const int SDL::WINDOW_WIDTH  = 640;
 const int SDL::FPS           = 60;
 
+int SDL::mouse_x;
+int SDL::mouse_y;
+
 /* static helper functions */
 static SDL_Rect create_rect(int w, int h)
 {
@@ -111,6 +114,11 @@ void SDL::quit()
     Mix_Quit();
     IMG_Quit();
     SDL_Quit();
+}
+
+void SDL::update_mouse_coords()
+{
+    SDL_GetMouseState(&SDL::mouse_x, &SDL::mouse_y);
 }
 
 void SDL::render_clear()
@@ -255,7 +263,7 @@ void SDL::render_rect(const SDL_Rect *rect, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
     SDL_SetRenderDrawColor(renderer, r, g, b, a);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_RenderFillRect(renderer, rect);
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+    //SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
     SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 }
 
@@ -290,4 +298,14 @@ size_t SDL::render_animation(size_t id, int x, int y)
 size_t SDL::times_played(size_t animation_id)
 {
     return animations[animation_id].times_played;
+}
+
+int SDL::texture_width(size_t id)
+{
+    return dimensions[id].w;
+}
+
+int SDL::texture_height(size_t id)
+{
+    return dimensions[id].h;
 }

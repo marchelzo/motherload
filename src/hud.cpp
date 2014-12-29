@@ -38,8 +38,8 @@ void HUD::draw()
                                                         60, 180, 60, 255));
 
     /* update the hull and fuel meters */
-    hull_rect.w = (int) ceil(82.0 * Digger::hull / Digger::MAX_HULL);
-    fuel_rect.w = (int) ceil(82.0 * Digger::fuel / Digger::MAX_FUEL);
+    hull_rect.w = (int) ceil(82.0 * (float) Digger::hull / (float) Digger::max_hull);
+    fuel_rect.w = (int) ceil(82.0 * Digger::fuel / Digger::max_fuel);
 
     SDL::render_texture(border_id, 47, 2);
     SDL::render_texture(border_id, 193, 2);

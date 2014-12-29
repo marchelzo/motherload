@@ -8,8 +8,11 @@ namespace SDL {
     extern const int WINDOW_WIDTH;
     extern const int WINDOW_HEIGHT;
     extern const int FPS;
+    extern int mouse_x;
+    extern int mouse_y;
     bool init();
     void quit();
+    void update_mouse_coords();
     void render_clear();
     void render_present();
     size_t load_animation(const std::string& path, size_t frames, size_t frame_dration);
@@ -29,5 +32,7 @@ namespace SDL {
     void play_sound_loop(size_t id);
     void stop_loop(size_t id);
     void stop_all_sounds();
+    int texture_width(size_t);
+    int texture_height(size_t);
 }
 
